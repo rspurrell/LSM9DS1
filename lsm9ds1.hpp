@@ -27,6 +27,34 @@
  */
 class LSM9DS1
 {
+public:
+
+    //----------------------------------------------------------------------
+    // I²C Addresses
+    //----------------------------------------------------------------------
+
+    /// Default I²C address of the accelerometer/gyroscope.
+    static constexpr uint8_t kAccelGyroAddress = 0x6B;
+
+    /// Default I²C address of the magnetometer.
+    static constexpr uint8_t kMagAddress = 0x1E;
+
+    //----------------------------------------------------------------------
+    // Registers
+    //----------------------------------------------------------------------
+
+    /// kWhoAmIRegister register.
+    static constexpr uint8_t kWhoAmIRegister = 0x0F;
+
+    //----------------------------------------------------------------------
+    // Expected Device IDs
+    //----------------------------------------------------------------------
+
+    /// Expected kWhoAmIRegister value for the accelerometer/gyroscope.
+    static constexpr uint8_t kAccelGyroId = 0x68;
+
+    /// Expected kWhoAmIRegister value for the magnetometer.
+    static constexpr uint8_t kMagId = 0x3D;
 
 private:
 
@@ -68,6 +96,38 @@ public:
      * @return True if open.
      */
     bool IsOpen() const;
+
+    /**
+     * @brief Reads the WHO_AM_I register from the accelerometer/gyroscope.
+     *
+     * @param[out] id Device identification value.
+     *
+     * @return True if successful.
+     */
+    bool WhoAmIAccelGyro(uint8_t& id);
+
+    /**
+     * @brief Reads the WHO_AM_I register from the magnetometer.
+     *
+     * @param[out] id Device identification value.
+     *
+     * @return True if successful.
+     */
+    bool WhoAmIMagnetometer(uint8_t& id);
+
+    /**
+     * @brief Verifies the accelerometer/gyroscope.
+     *
+     * @return True if the correct device is detected.
+     */
+    bool VerifyAccelGyro();
+
+    /**
+     * @brief Verifies the magnetometer.
+     *
+     * @return True if the correct device is detected.
+     */
+    bool VerifyMagnetometer();
 
 private:
 

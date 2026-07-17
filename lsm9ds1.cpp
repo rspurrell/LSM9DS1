@@ -78,3 +78,37 @@ bool LSM9DS1::WriteRegister(uint8_t addr, uint8_t reg, uint8_t value)
 
     return true;
 }
+
+bool LSM9DS1::WhoAmIAccelGyro(uint8_t& id)
+{
+    return ReadRegister(kAccelGyroAddress, kWhoAmIRegister, id);
+}
+
+bool LSM9DS1::WhoAmIMagnetometer(uint8_t& id)
+{
+    return ReadRegister(kMagAddress, kWhoAmIRegister, id);
+}
+
+bool LSM9DS1::VerifyAccelGyro()
+{
+    uint8_t id;
+
+    if (!WhoAmIAccelGyro(id))
+    {
+        return false;
+    }
+
+    return id == kAccelGyroId;
+}
+
+bool LSM9DS1::VerifyMagnetometer()
+{
+    uint8_t id;
+
+    if (!WhoAmIMagnetometer(id))
+    {
+        return false;
+    }
+
+    return id == kMagId;
+}
