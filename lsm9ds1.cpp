@@ -126,6 +126,46 @@ bool LSM9DS1::InitializeAccel(Accelerometer::CtrlReg6XL::Configuration accelConf
     return true;
 }
 
+bool LSM9DS1::ReadAcceleration(Math::Vector3<int16_t>& rawValues) const
+{
+    if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Accelerometer::OutputRegister::Out_X_L_XL), rawValues.x))
+    {
+        return false;
+    }
+
+    if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Accelerometer::OutputRegister::Out_Y_L_XL), rawValues.y))
+    {
+        return false;
+    }
+
+    if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Accelerometer::OutputRegister::Out_Z_L_XL), rawValues.z))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool LSM9DS1::ReadGyroscope(Math::Vector3<int16_t>& rawValues) const
+{
+    if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Gyroscope::OutputRegister::Out_X_L_G), rawValues.x))
+    {
+        return false;
+    }
+
+    if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Gyroscope::OutputRegister::Out_Y_L_G), rawValues.y))
+    {
+        return false;
+    }
+
+    if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Gyroscope::OutputRegister::Out_Z_L_G), rawValues.z))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool LSM9DS1::WhoAmIAccelGyro(uint8_t& id) const
 {
     return ReadRegister(kAccelGyroAddress, kWhoAmIRegister, id);

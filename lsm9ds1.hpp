@@ -13,6 +13,7 @@
 #include <string> // Provides the std::string class.
 
 #include "lsm9ds1_registers.hpp" // Provides Registers and bit definitions for the LSM9DS1.
+#include "vector3.hpp" // Provides the Math::Vector3 structure for 3D vectors.
 
 /**
  * @class LSM9DS1
@@ -80,6 +81,24 @@ public:
      * @return True if initialization succeeded.
      */
     bool InitializeAccel(Accelerometer::CtrlReg6XL::Configuration accelConfig);
+
+    /**
+     * @brief Reads the current acceleration.
+     *
+     * @param[out] rawValues Raw acceleration values.
+     *
+     * @return True if successful.
+     */
+    bool ReadAcceleration(Math::Vector3<int16_t>& rawValues) const;
+
+    /**
+     * @brief Reads the current angular velocity.
+     *
+     * @param[out] rawValues Raw gyroscope values.
+     *
+     * @return True if successful.
+     */
+    bool ReadGyroscope(Math::Vector3<int16_t>& rawValues) const;
 
     /**
      * @brief Reads the WHO_AM_I register from the accelerometer/gyroscope.
