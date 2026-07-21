@@ -98,6 +98,34 @@ bool LSM9DS1::WriteRegister(uint8_t addr, uint8_t reg, uint8_t value)
     return true;
 }
 
+bool LSM9DS1::InitializeAccelGyro(Accelerometer::CtrlReg6XL::Configuration accelConfig, Gyroscope::CtrlReg1G::Configuration gyroConfig)
+{
+    // Accelerometer must be configured first. Writing to CtrlReg6XL disables Gyro.
+    if (!InitializeAccel(accelConfig))
+    {
+        return false;
+    }
+
+    // Activates both the accelerometer and gyroscope at the same data rate.
+    if (!WriteRegister(kAccelGyroAddress, static_cast<uint8_t>(Gyroscope::ControlRegister::CtrlReg1G), gyroConfig.value))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool LSM9DS1::InitializeAccel(Accelerometer::CtrlReg6XL::Configuration accelConfig)
+{
+    // Enable the accelerometer with the specified configuration.
+    if (!WriteRegister(kAccelGyroAddress, static_cast<uint8_t>(Accelerometer::ControlRegister::CtrlReg6XL), accelConfig.value))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool LSM9DS1::WhoAmIAccelGyro(uint8_t& id) const
 {
     return ReadRegister(kAccelGyroAddress, kWhoAmIRegister, id);

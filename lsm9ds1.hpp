@@ -63,6 +63,25 @@ public:
     bool IsOpen() const;
 
     /**
+     * @brief Initializes the accelerometer and gyroscope.
+     *
+     * @param accelConfig Configuration for the accelerometer.
+     * @param gyroConfig Configuration for the gyroscope.
+     *
+     * @return True if initialization succeeded.
+     */
+    bool InitializeAccelGyro(Accelerometer::CtrlReg6XL::Configuration accelConfig, Gyroscope::CtrlReg1G::Configuration gyroConfig);
+
+    /**
+     * @brief Initializes the accelerometer.
+     *
+     * @param accelConfig Configuration for the accelerometer.
+     *
+     * @return True if initialization succeeded.
+     */
+    bool InitializeAccel(Accelerometer::CtrlReg6XL::Configuration accelConfig);
+
+    /**
      * @brief Reads the WHO_AM_I register from the accelerometer/gyroscope.
      *
      * @param[out] id Device identification value.
