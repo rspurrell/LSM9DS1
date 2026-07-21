@@ -6,8 +6,7 @@
 #include <unistd.h> // Declares POSIX functions such as read(), write(), and close().
 
 LSM9DS1::LSM9DS1(const std::string& device) : devicePath_(device), fd_(-1)
-{
-}
+{}
 
 LSM9DS1::~LSM9DS1()
 {
@@ -34,7 +33,7 @@ bool LSM9DS1::IsOpen() const
     return fd_ >= 0;
 }
 
-bool LSM9DS1::ReadRegister(uint8_t addr, uint8_t reg, uint8_t& value)
+bool LSM9DS1::ReadRegister(uint8_t addr, uint8_t reg, uint8_t& value) const
 {
     // Select the target sensor device on the shared I2C bus.
     if (ioctl(fd_, I2C_SLAVE, addr) < 0)
@@ -60,6 +59,26 @@ bool LSM9DS1::ReadRegister(uint8_t addr, uint8_t reg, uint8_t& value)
     return true;
 }
 
+bool LSM9DS1::ReadRegister16(uint8_t deviceAddress, uint8_t registerAddress, int16_t& value) const
+{
+    uint8_t lowByte;
+    uint8_t highByte;
+
+    if (!ReadRegister(deviceAddress, registerAddress, lowByte))
+    {
+        return false;
+    }
+
+    if (!ReadRegister(deviceAddress, registerAddress + 1, highByte))
+    {
+        return false;
+    }
+
+    value = static_cast<int16_t>((static_cast<uint16_t>(highByte) << 8) | lowByte);
+
+    return true;
+}
+
 bool LSM9DS1::WriteRegister(uint8_t addr, uint8_t reg, uint8_t value)
 {
     if (ioctl(fd_, I2C_SLAVE, addr) < 0)
@@ -79,17 +98,17 @@ bool LSM9DS1::WriteRegister(uint8_t addr, uint8_t reg, uint8_t value)
     return true;
 }
 
-bool LSM9DS1::WhoAmIAccelGyro(uint8_t& id)
+bool LSM9DS1::WhoAmIAccelGyro(uint8_t& id) const
 {
     return ReadRegister(kAccelGyroAddress, kWhoAmIRegister, id);
 }
 
-bool LSM9DS1::WhoAmIMagnetometer(uint8_t& id)
+bool LSM9DS1::WhoAmIMagnetometer(uint8_t& id) const
 {
     return ReadRegister(kMagAddress, kWhoAmIRegister, id);
 }
 
-bool LSM9DS1::VerifyAccelGyro()
+bool LSM9DS1::VerifyAccelGyro() const
 {
     uint8_t id;
 
@@ -101,7 +120,7 @@ bool LSM9DS1::VerifyAccelGyro()
     return id == kAccelGyroId;
 }
 
-bool LSM9DS1::VerifyMagnetometer()
+bool LSM9DS1::VerifyMagnetometer() const
 {
     uint8_t id;
 
