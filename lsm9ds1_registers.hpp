@@ -25,7 +25,7 @@ namespace Gyroscope
         * +--------+--------+--------+-------+-------+-----+-------+-------+
         * Bits 7-5: ODR_G   (Output data rate) [Default value: 000]
         * Bits 4-3: FS_G    (Full scale selection) [Default value: 00]
-        * Bit 2:    0       (must be set to 0 for correct operation)
+        * Bit 2:    Reserved [Default value: 0]
         * Bits 1-0: BW_G    (Bandwidth) [Default value: 00]
         */
         CtrlReg1G = 0x10, // Register 1: Gyro Control
@@ -40,7 +40,7 @@ namespace Gyroscope
          * +---+---+---+---+----------+----------+----------+----------+
          * | 0 | 0 | 0 | 0 | INT_SEL1 | INT_SEL0 | OUT_SEL1 | OUT_SEL0 |
          * +---+---+---+---+----------+----------+----------+----------+
-         * Bits 7-4: 0         (must be set to 0 for correct operation)
+         * Bits 7-4: Reserved  [Default value: 0000]
          * Bits 3-2: INT_SEL   (Gyroscope interrupt signal selection multiplexer) [Default value: 00]
          * Bits 1-0: OUT_SEL   (Gyroscope data output selection multiplexer) [Default value: 00]
          */
@@ -56,7 +56,7 @@ namespace Gyroscope
          * +---------+-------+---+---+--------+---------+---------+---------+
          * Bit 7:    LP_mode   (Low-power mode enable) [Default value: 0]
          * Bit 6:    HP_EN     (High-pass filter enable) [Default value: 0]
-         * Bits 5-4: 0         (must be set to 0 for the correct operation)
+         * Bits 5-4: Reserved  [Default value: 00]
          * Bits 3-0: HPCF_G    (Gyroscope high-pass filter cutoff frequency selection) [Default value: 0000]
          */
         CtrlReg3G = 0x12 // Register 3: Gyro Power and Filter Control
@@ -632,3 +632,539 @@ namespace Accelerometer
     };
 }
 #pragma endregion Accelerometer control registers
+
+#pragma region Magnetometer control registers
+namespace Magnetometer
+{
+    /**
+     * @brief Hardware register addresses for the LSM9DS1 Magnetometer control registers.
+     */
+    enum class ControlRegister : uint8_t
+    {
+        /**
+         * @brief Register 1: Magnetometer Control - CTRL_REG1_M: 0x20.
+         * @details This register configures the temperature compensation, X/Y-axis operating mode,
+         * output data rate, and fast output data rate options of the magnetometer.
+         * The register layout is as follows:
+         * Bit   7       6     5     4     3     2        1       0
+         * +----------+-----+-----+-----+-----+-----+----------+----+
+         * | TEMP_COMP| OM1 | OM0 | DO2 | DO1 | DO0 | FAST_ODR | ST |
+         * +----------+-----+-----+-----+-----+-----+----------+----+
+         * Bit 7:    TEMP_COMP (Temperature compensation enable) [Default value: 0]
+         * Bits 6-5: OM[1:0] (X/Y-axis operating mode) [Default value: 00]
+         * Bits 4-2: DO[2:0] (Output data rate selection) [Default value: 100]
+         * Bit 1:    FAST_ODR (Fast output data rate selection) [Default value: 0]
+         * Bit 0:    ST (Self-test enable) [Default value: 0]
+         */
+        CtrlReg1M = 0x20,
+
+        /**
+         * @brief Register 2: Magnetometer Control - CTRL_REG2_M: 0x21.
+         * @details This register configures the full-scale range, memory reboot function, and software reset function
+         * of the magnetometer.
+         * The register layout is as follows:
+         * Bit 7    6     5    4      3         2      1   0
+         * +-----+-----+-----+---+--------+----------+---+---+
+         * |   0 | FS1 | FS0 | 0 | REBOOT | SOFT_RST | 0 | 0 |
+         * +-----+-----+-----+---+--------+----------+---+---+
+         * Bit 7: Reserved [Default value: 0]
+         * Bits 6-5: FS[1:0] (Full-scale configuration) [Default value: 00]
+         * Bit 4: Reserved [Default value: 0]
+         * Bit 3: REBOOT (Reboot memory content) [Default value: 0]
+         * Bit 2: SOFT_RST (Configuration and user register reset) [Default value: 0]
+         * Bits 1-0: Reserved [Default value: 00]
+         */
+        CtrlReg2M = 0x21,
+
+        /**
+         * @brief Register 3: Magnetometer Control - CTRL_REG3_M: 0x22. Initialization register for the magnetometer.
+         * @details This register configures the I2C interface, low-power mode, SPI serial interface mode, and operating mode
+         * of the magnetometer.
+         * The register layout is as follows:
+         * Bit    7        6    5   4   3    2     1     0
+         * +-------------+---+----+---+---+-----+-----+-----+
+         * | I2C_DISABLE | 0 | LP | 0 | 0 | SIM | MD1 | MD0 |
+         * +-------------+---+----+---+---+-----+-----+-----+
+         * Bit 7: I2C_DISABLE (Disable I2C interface) [Default value: 0]
+         * Bit 6: Reserved    [Default value: 0]
+         * Bit 5: LP          (Low-power mode configuration) [Default value: 0]
+         * Bits 4-3: Reserved [Default value: 00]
+         * Bit 2: SIM         (SPI serial interface mode selection) [Default value: 0]
+         * Bits 1-0: MD[1:0]  (Operating mode selection) [Default value: 11]
+         */
+        CtrlReg3M = 0x22,
+
+        /**
+         * @brief Register 4: Magnetometer Control - CTRL_REG4_M: 0x23.
+         * @details This register configures the Z-axis operating mode and data byte ordering of the magnetometer.
+         * The register layout is as follows:
+         * Bit 7   6   5   4     3      2     1    0
+         * + ----+---+---+---+------+------+-----+---+
+         * |   0 | 0 | 0 | 0 | OMZ1 | OMZ0 | BLE | 0 |
+         * + ----+---+---+---+------+------+-----+---+
+         * Bits 7-4: Reserved [Default value: 0000]
+         * Bits 3-2: OMZ[1:0] (Z-axis operative mode selection) [Default value: 00]
+         * Bit 1: BLE (Big/Little Endian data selection) [Default value: 0]
+         * Bit 0: Reserved [Default value: 0]
+         */
+        CtrlReg4M = 0x23,
+
+        /**
+         * @brief Register 5: Magnetometer Control - CTRL_REG5_M: 0x24.
+         * @details This register configures the block data update and fast read functions of the magnetometer.
+         * The register layout is as follows:
+         * Bit   7        6    5   4   3   2   1   0
+         * +-----------+-----+---+---+---+---+---+---+
+         * | FAST_READ | BDU | 0 | 0 | 0 | 0 | 0 | 0 |
+         * +-----------+-----+---+---+---+---+---+---+
+         * Bit 7: BDU         (Block data update) [Default value: 0]
+         * Bit 6: FAST_READ   (Fast read enable) [Default value: 0]
+         * Bits 5-0: Reserved [Default value: 000000]
+         */
+        CtrlReg5M = 0x24
+    };
+
+    namespace CtrlReg1M
+    {
+        /**
+         * @brief Magnetometer temperature compensation configuration.
+         * @details This bit (TEMP_COMP) resides in CTRL_REG1_M (20h) [Bit 7].
+         * It enables or disables temperature compensation for the magnetometer.
+         */
+        enum class TemperatureCompensation : uint8_t
+        {
+            Disabled = 0x00,
+            Enabled = 0x80
+        };
+
+        /**
+         * @brief Magnetometer X/Y-axis operating mode configuration.
+         * @details These bits (OM[1:0]) reside in CTRL_REG1_M (20h) [Bits 6:5].
+         * They define the operating mode of the X and Y axes of the magnetometer.
+         */
+        enum class OperatingModeXYAxis : uint8_t
+        {
+            LowPerformance = 0x00,      // Default. Low-performance
+            MediumPerformance = 0x20,   // Medium-performance
+            HighPerformance = 0x40,     // High-performance
+            UltraHighPerformance = 0x60 // Ultra-high-performance
+        };
+
+        /**
+         * @brief Magnetometer output data rate configuration.
+         * @details These bits (DO[2:0]) reside in CTRL_REG1_M (20h) [Bits 4:2].
+         * They define the output data rate of the magnetometer.
+         */
+        enum class OutputDataRate : uint8_t
+        {
+            Hz_0_625 = 0x00, // 0.625 Hz
+            Hz_1_25 = 0x04,  // 1.25 Hz
+            Hz_2_5 = 0x08,   // 2.5 Hz
+            Hz_5 = 0x0C,     // 5 Hz
+            Hz_10 = 0x10,    // Default. 10 Hz
+            Hz_20 = 0x14,    // 20 Hz
+            Hz_40 = 0x18,    // 40 Hz
+            Hz_80 = 0x1C     // 80 Hz
+        };
+
+        /**
+         * @brief Magnetometer fast output data rate configuration.
+         * @details This bit (FAST_ODR) resides in CTRL_REG1_M (20h) [Bit 1].
+         * It enables the fast output data rate mode.
+         */
+        enum class FastOutputDataRate : uint8_t
+        {
+            Disabled = 0x00,
+            Enabled = 0x02
+        };
+
+        /**
+         * @brief Magnetometer self-test configuration.
+         * @details This bit (ST) resides in CTRL_REG1_M (20h) [Bit 0].
+         * It enables or disables the magnetometer self-test function.
+         */
+        enum class SelfTest : uint8_t
+        {
+            Disabled = 0x00,
+            Enabled = 0x01
+        };
+
+        /**
+         * @brief The bitmask for each segment of the CtrlReg1M register.
+         */
+        enum class BitMask : uint8_t
+        {
+            SelfTest = 0x01,
+            FastOutputDataRate = 0x02,
+            OutputDataRate = 0x1C,
+            OperatingModeXYAxis = 0x60,
+            TemperatureCompensation = 0x80,
+        };
+
+        /**
+         * @brief Configuration structure for the Magnetometer Temperature Compensation, X/Y-axis Operating Mode,
+         * Output Data Rate, Fast Output Data Rate, and Self-Test settings.
+         */
+        struct Configuration
+        {
+            const uint8_t value;
+
+            constexpr Configuration(
+                TemperatureCompensation temperatureCompensation,
+                OperatingModeXYAxis operatingModeXYAxis,
+                OutputDataRate odr,
+                FastOutputDataRate fastOdr,
+                SelfTest selfTest)
+                : value(
+                    static_cast<uint8_t>(temperatureCompensation) |
+                    static_cast<uint8_t>(operatingModeXYAxis) |
+                    static_cast<uint8_t>(odr) |
+                    static_cast<uint8_t>(fastOdr) |
+                    static_cast<uint8_t>(selfTest))
+            {}
+        };
+
+        constexpr TemperatureCompensation GetTemperatureCompensation(Configuration config)
+        {
+            return static_cast<TemperatureCompensation>(config.value & static_cast<uint8_t>(BitMask::TemperatureCompensation));
+        }
+
+        constexpr OperatingModeXYAxis GetOperatingModeXYAxis(Configuration config)
+        {
+            return static_cast<OperatingModeXYAxis>(config.value & static_cast<uint8_t>(BitMask::OperatingModeXYAxis));
+        }
+
+        constexpr OutputDataRate GetOutputDataRate(Configuration config)
+        {
+            return static_cast<OutputDataRate>(config.value & static_cast<uint8_t>(BitMask::OutputDataRate));
+        }
+    }
+
+    namespace CtrlReg2M
+    {
+        /**
+         * @brief Magnetometer full-scale configuration.
+         * @details These bits (FS[1:0]) reside in CTRL_REG2_M (21h) [Bits 6:5].
+         * They define the full-scale range of the magnetometer. The default value is 00,
+         * which corresponds to a range of ±4 gauss. The other options are ±8 gauss (01),
+         * ±12 gauss (10), and ±16 gauss (11).
+         */
+        enum class Scale : uint8_t
+        {
+            Gauss_4 = 0x00,  // Default. ±4 gauss.
+            Gauss_8 = 0x20,  // ±8 gauss.
+            Gauss_12 = 0x40, // ±12 gauss.
+            Gauss_16 = 0x60  // ±16 gauss.
+        };
+
+        /**
+         * @brief Magnetometer memory reboot configuration.
+         * @details This bit (REBOOT) resides in CTRL_REG2_M (21h) [Bit 3].
+         * It controls whether the memory content is rebooted. The default value is 0,
+         * which selects normal operating mode. Setting this bit to 1 reboots the memory content.
+         */
+        enum class Reboot : uint8_t
+        {
+            Normal = 0x00, // Default. Normal operating mode.
+            Reboot = 0x08  // Reboot memory content.
+        };
+
+        /**
+         * @brief Magnetometer software reset configuration.
+         * @details This bit (SOFT_RST) resides in CTRL_REG2_M (21h) [Bit 2].
+         * It controls the configuration and user register reset function. The default value is 0.
+         * Setting this bit to 1 initiates a reset operation.
+         */
+        enum class SoftReset : uint8_t
+        {
+            Normal = 0x00, // Default. Normal operation.
+            Reset = 0x04   // Initiate software reset operation.
+        };
+
+        /**
+         * @brief The bitmask for each segment of the CtrlReg2M register.
+         */
+        enum class BitMask : uint8_t
+        {
+            SoftReset = 0x04,
+            Reboot = 0x08,
+            Scale = 0x60,
+        };
+
+        /**
+         * @brief Configuration structure for the Magnetometer Full-Scale Range, Memory Reboot, and Software Reset settings.
+         */
+        struct Configuration
+        {
+            const uint8_t value;
+
+            constexpr Configuration(Scale scale, Reboot reboot, SoftReset softReset)
+                : value(static_cast<uint8_t>(scale) | static_cast<uint8_t>(reboot) | static_cast<uint8_t>(softReset))
+            {}
+        };
+
+        constexpr Scale GetScale(Configuration config)
+        {
+            return static_cast<Scale>(config.value & static_cast<uint8_t>(BitMask::Scale));
+        }
+
+        constexpr Reboot GetReboot(Configuration config)
+        {
+            return static_cast<Reboot>(config.value & static_cast<uint8_t>(BitMask::Reboot));
+        }
+
+        constexpr SoftReset GetSoftReset(Configuration config)
+        {
+            return static_cast<SoftReset>(config.value & static_cast<uint8_t>(BitMask::SoftReset));
+        }
+    }
+
+    namespace CtrlReg3M
+    {
+        /**
+         * @brief Magnetometer I2C interface configuration.
+         * @details This bit (I2C_DISABLE) resides in CTRL_REG3_M (22h) [Bit 7].
+         * It enables or disables the I2C interface of the magnetometer.
+         */
+        enum class I2CInterface : uint8_t
+        {
+            Enabled = 0x00,  // Default. I2C interface enabled.
+            Disabled = 0x80  // I2C interface disabled.
+        };
+
+        /**
+         * @brief Magnetometer low-power mode configuration.
+         * @details This bit (LP) resides in CTRL_REG3_M (22h) [Bit 5].
+         * When enabled, the magnetometer output data rate is forced to 0.625 Hz and the system
+         * performs the minimum number of averages for each channel. When disabled, the magnetic
+         * data rate is configured by the DO[2:0] bits in CTRL_REG1_M (20h).
+         */
+        enum class LowPowerMode : uint8_t
+        {
+            Disabled = 0x00, // Default. Output data rate is configured by CTRL_REG1_M DO[2:0].
+            Enabled = 0x20   // Output data rate is forced to 0.625 Hz with minimum averaging.
+        };
+
+        /**
+         * @brief Magnetometer SPI serial interface mode configuration.
+         * @details This bit (SIM) resides in CTRL_REG3_M (22h) [Bit 2].
+         * It selects the SPI serial interface mode. The default value enables SPI write-only
+         * operations. Setting this bit enables both SPI read and write operations.
+         */
+        enum class SpiInterfaceMode : uint8_t
+        {
+            WriteOnly = 0x00, // Default. SPI write operations enabled.
+            ReadWrite = 0x04  // SPI read and write operations enabled.
+        };
+
+        /**
+         * @brief Magnetometer operating mode configuration.
+         * @details These bits (MD[1:0]) reside in CTRL_REG3_M (22h) [Bits 1:0].
+         * They define the operating mode of the magnetometer. The default value is 11,
+         * which places the magnetometer in power-down mode.
+         */
+        enum class OperatingMode : uint8_t
+        {
+            ContinuousConversion = 0x00, // Continuous-conversion mode.
+            SingleConversion = 0x01,     // Single-conversion mode.
+            PowerDown_10 = 0x02,         // Power-down mode.
+            PowerDown_11 = 0x03          // Default. Power-down mode.
+        };
+
+        /**
+         * @brief The bitmask for each segment of the CtrlReg3M register.
+         */
+        enum class BitMask : uint8_t
+        {
+            I2CInterface = 0x80,
+            LowPowerMode = 0x20,
+            SpiInterfaceMode = 0x04,
+            OperatingMode = 0x03
+        };
+
+        /**
+         * @brief Configuration structure for the Magnetometer I2C Interface, Low-Power Mode,
+         * SPI Interface Mode, and Operating Mode settings.
+         */
+        struct Configuration
+        {
+            const uint8_t value;
+
+            constexpr Configuration(
+                I2CInterface i2cInterface,
+                LowPowerMode lowPowerMode,
+                SpiInterfaceMode spiInterfaceMode,
+                OperatingMode operatingMode)
+                : value(
+                    static_cast<uint8_t>(i2cInterface) |
+                    static_cast<uint8_t>(lowPowerMode) |
+                    static_cast<uint8_t>(spiInterfaceMode) |
+                    static_cast<uint8_t>(operatingMode))
+            {}
+        };
+
+        constexpr I2CInterface GetI2CInterface(Configuration config)
+        {
+            return static_cast<I2CInterface>(config.value & static_cast<uint8_t>(BitMask::I2CInterface));
+        }
+
+        constexpr LowPowerMode GetLowPowerMode(Configuration config)
+        {
+            return static_cast<LowPowerMode>(config.value & static_cast<uint8_t>(BitMask::LowPowerMode));
+        }
+
+        constexpr SpiInterfaceMode GetSpiInterfaceMode(Configuration config)
+        {
+            return static_cast<SpiInterfaceMode>(config.value & static_cast<uint8_t>(BitMask::SpiInterfaceMode));
+        }
+
+        constexpr OperatingMode GetOperatingMode(Configuration config)
+        {
+            return static_cast<OperatingMode>(config.value & static_cast<uint8_t>(BitMask::OperatingMode));
+        }
+    }
+
+    namespace CtrlReg4M
+    {
+        /**
+         * @brief Magnetometer Z-axis operating mode configuration.
+         * @details These bits (OMZ[1:0]) reside in CTRL_REG4_M (23h) [Bits 3:2].
+         * They define the operating mode of the Z-axis of the magnetometer. The default value is 00,
+         * which corresponds to low-performance mode. The other options are medium-performance mode (01),
+         * high-performance mode (10), and ultra-high-performance mode (11).
+         */
+        enum class OperatingModeZAxis : uint8_t
+        {
+            LowPerformance = 0x00,      // Default. Low-performance mode.
+            MediumPerformance = 0x04,   // Medium-performance mode.
+            HighPerformance = 0x08,     // High-performance mode.
+            UltraHighPerformance = 0x0C // Ultra-high-performance mode.
+        };
+
+        /**
+         * @brief Magnetometer data endianness configuration.
+         * @details This bit (BLE) resides in CTRL_REG4_M (23h) [Bit 1].
+         * It selects the byte order of the magnetometer output data. When disabled, the least
+         * significant byte is stored at the lower register address. When enabled, the most
+         * significant byte is stored at the lower register address.
+         */
+        enum class Endianness : uint8_t
+        {
+            LittleEndian = 0x00, // Default. Least significant byte at lower address.
+            BigEndian = 0x02     // Most significant byte at lower address.
+        };
+
+        /**
+         * @brief The bitmask for each segment of the CtrlReg4M register.
+         */
+        enum class BitMask : uint8_t
+        {
+            OperatingModeZAxis = 0x0C,
+            Endianness = 0x02
+        };
+
+        /**
+         * @brief Configuration structure for the Magnetometer Z-axis Operating Mode and Data Endianness settings.
+         */
+        struct Configuration
+        {
+            const uint8_t value;
+
+            constexpr Configuration(OperatingModeZAxis operatingModeZAxis, Endianness endianness)
+                : value(static_cast<uint8_t>(operatingModeZAxis) | static_cast<uint8_t>(endianness))
+            {}
+        };
+
+        constexpr OperatingModeZAxis GetOperatingModeZAxis(Configuration config)
+        {
+            return static_cast<OperatingModeZAxis>(config.value & static_cast<uint8_t>(BitMask::OperatingModeZAxis));
+        }
+
+        constexpr Endianness GetEndianness(Configuration config)
+        {
+            return static_cast<Endianness>(config.value & static_cast<uint8_t>(BitMask::Endianness));
+        }
+    }
+
+    namespace CtrlReg5M
+    {
+        /**
+         * @brief Magnetometer high-byte fast-read configuration.
+         * @details This bit (FAST_READ) resides in CTRL_REG5_M (24h) [Bit 7].
+         * When disabled, the complete magnetometer output data can be read.
+         * When enabled, only the high part of the DATA OUT registers is read,
+         * increasing reading efficiency.
+         */
+        enum class FastRead : uint8_t
+        {
+            Disabled = 0x00, // Default. FAST_READ disabled.
+            Enabled = 0x80   // FAST_READ enabled. Only the high part of DATA OUT is read.
+        };
+
+        /**
+         * @brief Magnetometer block data update configuration.
+         * @details This bit (BDU) resides in CTRL_REG5_M (24h) [Bit 6].
+         * When disabled, the magnetometer output registers are continuously updated.
+         * When enabled, the output registers are not updated until both the MSB and LSB
+         * registers of the magnetic data have been read.
+         */
+        enum class BlockDataUpdate : uint8_t
+        {
+            Continuous = 0x00, // Default. Output registers continuously updated.
+            Blocked = 0x40     // Output registers not updated until MSB and LSB have been read.
+        };
+
+        /**
+         * @brief The bitmask for each segment of the CtrlReg5M register.
+         */
+        enum class BitMask : uint8_t
+        {
+            FastRead = 0x80,
+            BlockDataUpdate = 0x40
+        };
+
+        /**
+         * @brief Configuration structure for the Magnetometer FAST_READ and Block Data Update settings.
+         */
+        struct Configuration
+        {
+            const uint8_t value;
+
+            constexpr Configuration(FastRead fastRead, BlockDataUpdate blockDataUpdate)
+                : value(static_cast<uint8_t>(fastRead) | static_cast<uint8_t>(blockDataUpdate))
+            {}
+        };
+
+        constexpr FastRead GetFastRead(Configuration config)
+        {
+            return static_cast<FastRead>(config.value & static_cast<uint8_t>(BitMask::FastRead));
+        }
+
+        constexpr BlockDataUpdate GetBlockDataUpdate(Configuration config)
+        {
+            return static_cast<BlockDataUpdate>(config.value & static_cast<uint8_t>(BitMask::BlockDataUpdate));
+        }
+    }
+
+    /**
+     * @brief Hardware register addresses for the LSM9DS1 Magnetometer output registers.
+     * @details These registers hold the raw 16-bit signed (twos-complement) magnetic field data
+     * for each axis, split into two 8-bit registers (Low and High bytes).
+     */
+    enum class OutputRegister : uint8_t
+    {
+        /// Magnetometer sensor X-axis output register (Low Byte).
+        Out_X_L_M = 0x28,
+        /// Magnetometer sensor X-axis output register (High Byte).
+        Out_X_H_M = 0x29,
+        /// Magnetometer sensor Y-axis output register (Low Byte).
+        Out_Y_L_M = 0x2A,
+        /// Magnetometer sensor Y-axis output register (High Byte).
+        Out_Y_H_M = 0x2B,
+        /// Magnetometer sensor Z-axis output register (Low Byte).
+        Out_Z_L_M = 0x2C,
+        /// Magnetometer sensor Z-axis output register (High Byte).
+        Out_Z_H_M = 0x2D
+    };
+}
+#pragma endregion Magnetometer control registers
