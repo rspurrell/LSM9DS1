@@ -1092,7 +1092,7 @@ namespace Magnetometer
          * @brief Magnetometer high-byte fast-read configuration.
          * @details This bit (FAST_READ) resides in CTRL_REG5_M (24h) [Bit 7].
          * When disabled, the complete magnetometer output data can be read.
-         * When enabled, only the high part of the DATA OUT registers is read,
+         * When enabled, only the high part of the DATA OUT registers may be read,
          * increasing reading efficiency.
          */
         enum class FastRead : uint8_t

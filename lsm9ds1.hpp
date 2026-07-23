@@ -85,6 +85,25 @@ public:
     bool InitializeAccel(Accelerometer::CtrlReg6XL::Configuration accelConfig);
 
     /**
+     * @brief Initializes the magnetometer.
+     *
+     * @param configR1M Configuration for the magnetometer register 1.
+     * @param configR2M Configuration for the magnetometer register 2.
+     * @param configR3M Configuration for the magnetometer register 3.
+     * @param configR4M Configuration for the magnetometer register 4.
+     * @param configR5M Configuration for the magnetometer register 5.
+     *
+     * @return True if initialization succeeded.
+     */
+    bool InitializeMagnetometer(
+        Magnetometer::CtrlReg1M::Configuration configR1M,
+        Magnetometer::CtrlReg2M::Configuration configR2M,
+        Magnetometer::CtrlReg3M::Configuration configR3M,
+        Magnetometer::CtrlReg4M::Configuration configR4M,
+        Magnetometer::CtrlReg5M::Configuration configR5M
+    );
+
+    /**
      * @brief Reads the current acceleration.
      *
      * @param[out] rawValues Raw acceleration values.
@@ -220,4 +239,15 @@ private:
     std::unique_ptr<Accelerometer::CtrlReg6XL::Configuration> pCtrlReg6XLConfig_;
     /// Stores the current active gyroscope configuration for CtrlReg1G
     std::unique_ptr<Gyroscope::CtrlReg1G::Configuration> pCtrlReg1GConfig_;
+
+    /// Stores the current active Magnetometer configuration for CtrlReg1M
+    std::unique_ptr<Magnetometer::CtrlReg1M::Configuration> pCtrlReg1MConfig_;
+    /// Stores the current active Magnetometer configuration for CtrlReg2M
+    std::unique_ptr<Magnetometer::CtrlReg2M::Configuration> pCtrlReg2MConfig_;
+    /// Stores the current active Magnetometer configuration for CtrlReg3M
+    std::unique_ptr<Magnetometer::CtrlReg3M::Configuration> pCtrlReg3MConfig_;
+    /// Stores the current active Magnetometer configuration for CtrlReg4M
+    std::unique_ptr<Magnetometer::CtrlReg4M::Configuration> pCtrlReg4MConfig_;
+    /// Stores the current active Magnetometer configuration for CtrlReg5M
+    std::unique_ptr<Magnetometer::CtrlReg5M::Configuration> pCtrlReg5MConfig_;
 };

@@ -134,6 +134,46 @@ bool LSM9DS1::InitializeAccel(Accelerometer::CtrlReg6XL::Configuration accelConf
     return true;
 }
 
+bool LSM9DS1::InitializeMagnetometer(
+    Magnetometer::CtrlReg1M::Configuration configR1M,
+    Magnetometer::CtrlReg2M::Configuration configR2M,
+    Magnetometer::CtrlReg3M::Configuration configR3M,
+    Magnetometer::CtrlReg4M::Configuration configR4M,
+    Magnetometer::CtrlReg5M::Configuration configR5M
+)
+{
+    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg1M), configR1M.value))
+    {
+        return false;
+    }
+    pCtrlReg1MConfig_ = std::make_unique<Magnetometer::CtrlReg1M::Configuration>(configR1M);
+
+    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg2M), configR2M.value))
+    {
+        return false;
+    }
+    pCtrlReg2MConfig_ = std::make_unique<Magnetometer::CtrlReg2M::Configuration>(configR2M);
+
+    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg3M), configR3M.value))
+    {
+        return false;
+    }
+    pCtrlReg3MConfig_ = std::make_unique<Magnetometer::CtrlReg3M::Configuration>(configR3M);
+
+    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg4M), configR4M.value))
+    {
+        return false;
+    }
+    pCtrlReg4MConfig_ = std::make_unique<Magnetometer::CtrlReg4M::Configuration>(configR4M);
+
+    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg5M), configR5M.value))
+    {
+        return false;
+    }
+    pCtrlReg5MConfig_ = std::make_unique<Magnetometer::CtrlReg5M::Configuration>(configR5M);
+    return true;
+}
+
 bool LSM9DS1::ReadAcceleration(Math::Vector3<int16_t>& rawValues) const
 {
     if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Accelerometer::OutputRegister::Out_X_L_XL), rawValues.x))
