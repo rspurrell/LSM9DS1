@@ -104,4 +104,38 @@ namespace Convert
             static_cast<float>(rawValues.z) * sensitivity
         };
     }
+
+    Math::Vector3<float> ToMilliGauss(const Math::Vector3<int16_t>& rawValues, Magnetometer::CtrlReg2M::Scale scale)
+    {
+        float sensitivity;
+
+        switch (scale)
+        {
+            case Magnetometer::CtrlReg2M::Scale::Gauss_4:
+                sensitivity = 0.14F;
+                break;
+
+            case Magnetometer::CtrlReg2M::Scale::Gauss_8:
+                sensitivity = 0.29F;
+                break;
+
+            case Magnetometer::CtrlReg2M::Scale::Gauss_12:
+                sensitivity = 0.43F;
+                break;
+
+            case Magnetometer::CtrlReg2M::Scale::Gauss_16:
+                sensitivity = 0.58F;
+                break;
+
+            default:
+                throw std::invalid_argument("Invalid magnetometer scale.");
+        }
+
+        return Math::Vector3<float>
+        {
+            static_cast<float>(rawValues.x) * sensitivity,
+            static_cast<float>(rawValues.y) * sensitivity,
+            static_cast<float>(rawValues.z) * sensitivity
+        };
+    }
 }

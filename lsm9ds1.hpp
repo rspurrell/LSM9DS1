@@ -149,6 +149,24 @@ public:
     bool ReadGyroscopeDps(Math::Vector3<float>& dps) const;
 
     /**
+     * @brief Reads the current magnetometer sensor data.
+     *
+     * @param[out] rawValues Raw magnetometer values.
+     *
+     * @return True if successful.
+     */
+    bool ReadMagnetometer(Math::Vector3<int16_t>& rawValues) const;
+
+    /**
+     * @brief Reads the current magnetometer sensor data in milligauss.
+     *
+     * @param[out] magMilliGauss Magnetometer values in milligauss.
+     *
+     * @return True if successful.
+     */
+    bool ReadMagnetometerMilliGauss(Math::Vector3<float>& magMilliGauss) const;
+
+    /**
      * @brief Reads the WHO_AM_I register from the accelerometer/gyroscope.
      *
      * @param[out] id Device identification value.

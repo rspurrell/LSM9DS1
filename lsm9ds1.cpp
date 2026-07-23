@@ -268,6 +268,43 @@ bool LSM9DS1::ReadGyroscopeDps(Math::Vector3<float>& dps) const
     return true;
 }
 
+bool LSM9DS1::ReadMagnetometer(Math::Vector3<int16_t>& rawValues) const
+{
+    if (!ReadRegister16(kMagAddress, static_cast<uint8_t>(Magnetometer::OutputRegister::Out_X_L_M), rawValues.x))
+    {
+        return false;
+    }
+
+    if (!ReadRegister16(kMagAddress, static_cast<uint8_t>(Magnetometer::OutputRegister::Out_Y_L_M), rawValues.y))
+    {
+        return false;
+    }
+
+    if (!ReadRegister16(kMagAddress, static_cast<uint8_t>(Magnetometer::OutputRegister::Out_Z_L_M), rawValues.z))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool LSM9DS1::ReadMagnetometerMilliGauss(Math::Vector3<float>& magMilliGauss) const
+{
+    if (!pCtrlReg3MConfig_ || !pCtrlReg2MConfig_)
+    {
+        return false;
+    }
+
+    Math::Vector3<int16_t> rawValues;
+    if (!ReadMagnetometer(rawValues))
+    {
+        return false;
+    }
+
+    magMilliGauss = Convert::ToMilliGauss(rawValues, Magnetometer::CtrlReg2M::GetScale(*pCtrlReg2MConfig_));
+
+    return true;
+}
+
 bool LSM9DS1::WhoAmIAccelGyro(uint8_t& id) const
 {
     return ReadRegister(kAccelGyroAddress, kWhoAmIRegister, id);
