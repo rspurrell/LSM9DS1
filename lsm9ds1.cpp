@@ -112,6 +112,9 @@ bool LSM9DS1::InitializeAccelGyro(Accelerometer::CtrlReg6XL::Configuration accel
         return false;
     }
 
+    // Store gyroscope configuration after successfully writing it to the hardware.
+    pCtrlReg1GConfig_ = std::make_unique<Gyroscope::CtrlReg1G::Configuration>(gyroConfig);
+
     return true;
 }
 
@@ -122,6 +125,11 @@ bool LSM9DS1::InitializeAccel(Accelerometer::CtrlReg6XL::Configuration accelConf
     {
         return false;
     }
+
+    // Store accelerometer configuration after successfully writing it to the hardware.
+    pCtrlReg6XLConfig_ = std::make_unique<Accelerometer::CtrlReg6XL::Configuration>(accelConfig);
+    // Writing to CTRL_REG6_XL places the gyroscope into power-down mode. Clear any gyroscope configuration.
+    pCtrlReg1GConfig_.reset();
 
     return true;
 }
@@ -146,6 +154,42 @@ bool LSM9DS1::ReadAcceleration(Math::Vector3<int16_t>& rawValues) const
     return true;
 }
 
+bool LSM9DS1::ReadAccelerationMetersPerSecondSquared(Math::Vector3<float>& accMpsps) const
+{
+    if (!pCtrlReg6XLConfig_)
+    {
+        return false;
+    }
+
+    Math::Vector3<int16_t> rawValues;
+    if (!ReadAcceleration(rawValues))
+    {
+        return false;
+    }
+
+    accMpsps = Convert::ToMetersPerSecondSquared(rawValues, Accelerometer::CtrlReg6XL::GetScale(*pCtrlReg6XLConfig_));
+
+    return true;
+}
+
+bool LSM9DS1::ReadAccelerationGs(Math::Vector3<float>& accGs) const
+{
+    if (!pCtrlReg6XLConfig_)
+    {
+        return false;
+    }
+
+    Math::Vector3<int16_t> rawValues;
+    if (!ReadAcceleration(rawValues))
+    {
+        return false;
+    }
+
+    accGs = Convert::ToGs(rawValues, Accelerometer::CtrlReg6XL::GetScale(*pCtrlReg6XLConfig_));
+
+    return true;
+}
+
 bool LSM9DS1::ReadGyroscope(Math::Vector3<int16_t>& rawValues) const
 {
     if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Gyroscope::OutputRegister::Out_X_L_G), rawValues.x))
@@ -162,6 +206,24 @@ bool LSM9DS1::ReadGyroscope(Math::Vector3<int16_t>& rawValues) const
     {
         return false;
     }
+
+    return true;
+}
+
+bool LSM9DS1::ReadGyroscopeDps(Math::Vector3<float>& dps) const
+{
+    if (!pCtrlReg1GConfig_)
+    {
+        return false;
+    }
+
+    Math::Vector3<int16_t> rawValues;
+    if (!ReadGyroscope(rawValues))
+    {
+        return false;
+    }
+
+    dps = Convert::ToDegreesPerSecond(rawValues, Gyroscope::CtrlReg1G::GetScale(*pCtrlReg1GConfig_));
 
     return true;
 }

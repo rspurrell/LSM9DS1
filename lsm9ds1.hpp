@@ -10,9 +10,11 @@
 #pragma once
 
 #include <cstdint> // Provides fixed-width integer types (uint8_t, uint16_t, etc.).
+#include <memory> // Provides dynamic memory management
 #include <string> // Provides the std::string class.
 
 #include "lsm9ds1_registers.hpp" // Provides Registers and bit definitions for the LSM9DS1.
+#include "lsm9ds1_utils.hpp" // Provides the Math::Vector3 structure for 3D vectors.
 #include "vector3.hpp" // Provides the Math::Vector3 structure for 3D vectors.
 
 /**
@@ -92,6 +94,24 @@ public:
     bool ReadAcceleration(Math::Vector3<int16_t>& rawValues) const;
 
     /**
+     * @brief Reads the current acceleration in meters per second squared (m/s²).
+     *
+     * @param[out] accMpsps Acceleration values in m/s².
+     *
+     * @return True if successful.
+     */
+    bool ReadAccelerationMetersPerSecondSquared(Math::Vector3<float>& accMpsps) const;
+
+    /**
+     * @brief Reads the current acceleration in units of gravitational acceleration (G).
+     *
+     * @param[out] accGs Acceleration values in Gs.
+     *
+     * @return True if successful.
+     */
+    bool ReadAccelerationGs(Math::Vector3<float>& accGs) const;
+
+    /**
      * @brief Reads the current angular velocity.
      *
      * @param[out] rawValues Raw gyroscope values.
@@ -99,6 +119,15 @@ public:
      * @return True if successful.
      */
     bool ReadGyroscope(Math::Vector3<int16_t>& rawValues) const;
+
+    /**
+     * @brief Reads the current angular velocity in degrees per seond.
+     *
+     * @param[out] dps Gyroscope values in degrees per second.
+     *
+     * @return True if successful.
+     */
+    bool ReadGyroscopeDps(Math::Vector3<float>& dps) const;
 
     /**
      * @brief Reads the WHO_AM_I register from the accelerometer/gyroscope.
@@ -186,4 +215,9 @@ private:
 
     /// Linux file descriptor.
     int fd_;
+
+    /// Stores the current active accelerometer configuration for CtrlReg6XL
+    std::unique_ptr<Accelerometer::CtrlReg6XL::Configuration> pCtrlReg6XLConfig_;
+    /// Stores the current active gyroscope configuration for CtrlReg1G
+    std::unique_ptr<Gyroscope::CtrlReg1G::Configuration> pCtrlReg1GConfig_;
 };

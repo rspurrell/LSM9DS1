@@ -152,6 +152,16 @@ namespace Gyroscope
         };
 
         /**
+         * @brief The bitmask for each segment of the CtrlReg1G register
+         */
+        enum class BitMask : uint8_t
+        {
+            Bandwidth = 0x03,
+            Scale = 0x18,
+            OutputDataRate = 0xE0,
+        };
+
+        /**
          * @brief Configuration structure for the Gyroscope Output Data Rate, Full-Scale Range, and Bandwidth Selection.
          */
         struct Configuration
@@ -162,6 +172,11 @@ namespace Gyroscope
                 : value(static_cast<uint8_t>(odr) | static_cast<uint8_t>(scale) | static_cast<uint8_t>(bandwidth))
             {}
         };
+
+        constexpr Scale GetScale(Configuration config)
+        {
+            return static_cast<Scale>(config.value & static_cast<uint8_t>(BitMask::Scale));
+        }
     }
 
     namespace CtrlReg2G
@@ -236,6 +251,15 @@ namespace Gyroscope
              * along with high-frequency mechanical jitters before writing to the output registers.
              */
             LPF1_HPF_LPF2 = 0x03
+        };
+
+        /**
+         * @brief The bitmask for each segment of the CtrlReg2G register
+         */
+        enum class BitMask : uint8_t
+        {
+            OutputFilterPath = 0x03,
+            InterruptFilterPath = 0x0C,
         };
 
         /**
@@ -411,6 +435,16 @@ namespace Gyroscope
         };
 
         /**
+         * @brief The bitmask for each segment of the CtrlReg3G register
+         */
+        enum class BitMask : uint8_t
+        {
+            HighPassFilterCutoff = 0x0F,
+            HighPassFilterState = 0x40,
+            PowerMode = 0x80,
+        };
+
+        /**
          * @brief Configuration structure for the Gyroscope Power Mode, High-Pass Filter State, and High-Pass Filter Cutoff Frequency.
          */
         struct Configuration
@@ -548,6 +582,17 @@ namespace Accelerometer
         };
 
         /**
+         * @brief The bitmask for each segment of the CtrlReg6XL register
+         */
+        enum class BitMask : uint8_t
+        {
+            AntiAliasFilter = 0x03,
+            Bandwidth = 0x04,
+            Scale = 0x18,
+            OutputDataRate = 0xE0,
+        };
+
+        /**
          * @brief Configuration structure for the Accelerometer Output Data Rate, Full-Scale Range, Bandwidth, and Anti-Alias Filter.
          */
         struct Configuration
@@ -558,6 +603,11 @@ namespace Accelerometer
                 : value(static_cast<uint8_t>(odr) | static_cast<uint8_t>(scale) | static_cast<uint8_t>(bandwidth) | static_cast<uint8_t>(filter))
             {}
         };
+
+        constexpr Scale GetScale(Configuration config)
+        {
+            return static_cast<Scale>(config.value & static_cast<uint8_t>(BitMask::Scale));
+        }
     };
 
     /**
