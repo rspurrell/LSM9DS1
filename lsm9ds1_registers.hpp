@@ -1151,6 +1151,27 @@ namespace Magnetometer
      * @details These registers hold the raw 16-bit signed (twos-complement) magnetic field data
      * for each axis, split into two 8-bit registers (Low and High bytes).
      */
+    enum class OffsetRegister : uint8_t
+    {
+        /// Magnetometer sensor X-axis offset register (Low Byte).
+        Offset_X_L_M = 0x05,
+        /// Magnetometer sensor X-axis offset register (High Byte).
+        Offset_X_H_M = 0x06,
+        /// Magnetometer sensor Y-axis offset register (Low Byte).
+        Offset_Y_L_M = 0x07,
+        /// Magnetometer sensor Y-axis offset register (High Byte).
+        Offset_Y_H_M = 0x08,
+        /// Magnetometer sensor Z-axis offset register (Low Byte).
+        Offset_Z_L_M = 0x09,
+        /// Magnetometer sensor Z-axis offset register (High Byte).
+        Offset_Z_H_M = 0x0A
+    };
+
+    /**
+     * @brief Hardware register addresses for the LSM9DS1 Magnetometer output registers.
+     * @details These registers hold the raw 16-bit signed (twos-complement) magnetic field data
+     * for each axis, split into two 8-bit registers (Low and High bytes).
+     */
     enum class OutputRegister : uint8_t
     {
         /// Magnetometer sensor X-axis output register (Low Byte).
