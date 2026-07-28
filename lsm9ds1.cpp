@@ -1,5 +1,7 @@
 #include "lsm9ds1.hpp"
 
+#include <algorithm> // Provides access to std::clamp.
+#include <limits> // Provides access to numeric_limits lowest() and max().
 #include <fcntl.h> // Declares file control options and the open() function.
 #include <linux/i2c-dev.h> // Declares the Linux I²C userspace API.
 #include <sys/ioctl.h> // Declares the ioctl() function for device control.
@@ -278,6 +280,62 @@ bool LSM9DS1::ReadGyroscopeRps(Math::Vector3<float>& rps) const
     return true;
 }
 
+Math::Vector3<int16_t> LSM9DS1::ApplyMagnetometerCalibration(const Math::Vector3<int16_t>& rawMag) const
+{
+    // If no calibration is enabled, return the raw values unchanged.
+    if (!optMagCalibration_ || !optMagCalibration_->enabled)
+    {
+        return rawMag;
+    }
+
+    // Apply the hard-iron offset (centering the circle).
+    // Using int32_t internally to prevent any chance of underflow/overflow during math.
+    int32_t centeredX = static_cast<int32_t>(rawMag.x) - optMagCalibration_->offsetX;
+    int32_t centeredY = static_cast<int32_t>(rawMag.y) - optMagCalibration_->offsetY;
+    int32_t centeredZ = static_cast<int32_t>(rawMag.z) - optMagCalibration_->offsetZ;
+
+    // Apply the soft-iron multiplier scale and bit-shift back down by 10 bits (/1024).
+    // Note: Calibration is bit-shifted up by 10 bits to keep us out of fraction territory.
+    // We want integers. We need to shift down.
+    int32_t calibratedX = (centeredX * optMagCalibration_->scaleX) >> 10;
+    int32_t calibratedY = (centeredY * optMagCalibration_->scaleY) >> 10;
+    int32_t calibratedZ = (centeredZ * optMagCalibration_->scaleZ) >> 10;
+
+    // Clamp values to fit back cleanly into int16_t limits.
+    constexpr int32_t minLimit = static_cast<int32_t>(rawMin_);
+    constexpr int32_t maxLimit = static_cast<int32_t>(rawMax_);
+    return {
+        static_cast<int16_t>(std::clamp(calibratedX, minLimit, maxLimit)),
+        static_cast<int16_t>(std::clamp(calibratedY, minLimit, maxLimit)),
+        static_cast<int16_t>(std::clamp(calibratedZ, minLimit, maxLimit))
+    };
+}
+
+bool LSM9DS1::UpdateCalibrationLimits()
+{
+    Math::Vector3<int16_t> rawValues;
+    if (!ReadMagnetometer(rawValues))
+    {
+        return false;
+    }
+
+    rawMagMin_.x = std::min(rawMagMin_.x, rawValues.x);
+    rawMagMax_.x = std::max(rawMagMax_.x, rawValues.x);
+
+    rawMagMin_.y = std::min(rawMagMin_.y, rawValues.y);
+    rawMagMax_.y = std::max(rawMagMax_.y, rawValues.y);
+
+    rawMagMin_.z = std::min(rawMagMin_.z, rawValues.z);
+    rawMagMax_.z = std::max(rawMagMax_.z, rawValues.z);
+
+    return true;
+}
+
+void LSM9DS1::LoadCalibration(MagnetometerCalibration&& calibration)
+{
+    optMagCalibration_ = std::move(calibration);
+}
+
 bool LSM9DS1::ReadMagnetometer(Math::Vector3<int16_t>& rawValues) const
 {
     if (!pCtrlReg3MConfig_ || !pCtrlReg2MConfig_)
@@ -303,6 +361,19 @@ bool LSM9DS1::ReadMagnetometer(Math::Vector3<int16_t>& rawValues) const
     return true;
 }
 
+bool LSM9DS1::ReadMagnetometerCalibrated(Math::Vector3<int16_t>& calValues) const
+{
+    Math::Vector3<int16_t> rawValues;
+    if (!ReadMagnetometer(rawValues))
+    {
+        return false;
+    }
+
+    calValues = ApplyMagnetometerCalibration(rawValues);
+
+    return true;
+}
+
 bool LSM9DS1::ReadMagnetometerMilliGauss(Math::Vector3<float>& magMilliGauss) const
 {
     Math::Vector3<int16_t> rawValues;
@@ -314,6 +385,29 @@ bool LSM9DS1::ReadMagnetometerMilliGauss(Math::Vector3<float>& magMilliGauss) co
     magMilliGauss = Convert::ToMilliGauss(rawValues, Magnetometer::CtrlReg2M::GetScale(*pCtrlReg2MConfig_));
 
     return true;
+}
+
+bool LSM9DS1::ReadMagnetometerMilliGaussCalibrated(Math::Vector3<float>& mgCalibrated) const
+{
+    Math::Vector3<int16_t> rawValues;
+    if (!ReadMagnetometer(rawValues))
+    {
+        return false;
+    }
+
+    mgCalibrated = Convert::ToMilliGauss(ApplyMagnetometerCalibration(rawValues), Magnetometer::CtrlReg2M::GetScale(*pCtrlReg2MConfig_));
+
+    return true;
+}
+
+const Math::Vector3<int16_t> LSM9DS1::GetMinMagLimits() const
+{
+    return rawMagMin_;
+}
+
+const Math::Vector3<int16_t> LSM9DS1::GetMaxMagLimits() const
+{
+    return rawMagMax_;
 }
 
 bool LSM9DS1::WhoAmIAccelGyro(uint8_t& id) const

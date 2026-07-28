@@ -17,12 +17,26 @@ namespace Math
     struct Vector3
     {
         /// X-axis component.
-        T x;
-
+        T x{0};
         /// Y-axis component.
-        T y;
-
+        T y{0};
         /// Z-axis component.
-        T z;
+        T z{0};
+
+        T& roll  = x;
+        T& pitch = y;
+        T& yaw   = z;
+
+        constexpr Vector3() = default;
+        constexpr Vector3(T x, T y, T z) : x(x), y(y), z(z) {}
+        constexpr Vector3(const Vector3& v) : x(v.x), y(v.y), z(v.z) {}
+
+        constexpr Vector3& operator=(const Vector3& v)
+        {
+            x = v.x;
+            y = v.y;
+            z = v.z;
+            return *this;
+        }
     };
 }
