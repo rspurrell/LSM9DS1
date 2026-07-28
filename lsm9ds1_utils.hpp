@@ -51,7 +51,17 @@ namespace Convert
     Math::Vector3<float> ToDegreesPerSecond(const Math::Vector3<int16_t>& rawValues, Gyroscope::CtrlReg1G::Scale scale);
 
     /**
-     * @brief Converts raw Magnetometer values into degrees per second.
+     * @brief Converts raw gyroscope values into radians per second.
+     *
+     * @param rawValues Raw signed 16-bit gyroscope values returned by the LSM9DS1.
+     * @param scale Gyroscope full-scale range used when the sensor was configured.
+     *
+     * @return Angular velocity values expressed in radians per second.
+     */
+    Math::Vector3<float> ToRadiansPerSecond(const Math::Vector3<int16_t>& rawValues, Gyroscope::CtrlReg1G::Scale scale);
+
+    /**
+     * @brief Converts raw Magnetometer values into milligauss.
      *
      * @param rawValues Raw signed 16-bit magnetometer values returned by the LSM9DS1.
      * @param scale Magnetometer full-scale range used when the sensor was configured.

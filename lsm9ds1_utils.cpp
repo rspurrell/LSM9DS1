@@ -105,6 +105,16 @@ namespace Convert
         };
     }
 
+    Math::Vector3<float> ToRadiansPerSecond(const Math::Vector3<int16_t>& rawValues, Gyroscope::CtrlReg1G::Scale scale)
+    {
+        constexpr float kDegreesToRadians = 0.01745329251994329577f; // PI / 180
+        Math::Vector3<float> dps = ToDegreesPerSecond(rawValues, scale);
+        dps.x = dps.x * kDegreesToRadians;
+        dps.y = dps.y * kDegreesToRadians;
+        dps.z = dps.z * kDegreesToRadians;
+        return dps;
+    }
+
     Math::Vector3<float> ToMilliGauss(const Math::Vector3<int16_t>& rawValues, Magnetometer::CtrlReg2M::Scale scale)
     {
         float sensitivity;

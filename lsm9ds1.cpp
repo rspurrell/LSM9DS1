@@ -268,6 +268,19 @@ bool LSM9DS1::ReadGyroscopeDps(Math::Vector3<float>& dps) const
     return true;
 }
 
+bool LSM9DS1::ReadGyroscopeRps(Math::Vector3<float>& rps) const
+{
+    Math::Vector3<int16_t> rawValues;
+    if (!ReadGyroscope(rawValues))
+    {
+        return false;
+    }
+
+    rps = Convert::ToRadiansPerSecond(rawValues, Gyroscope::CtrlReg1G::GetScale(*pCtrlReg1GConfig_));
+
+    return true;
+}
+
 bool LSM9DS1::ReadMagnetometer(Math::Vector3<int16_t>& rawValues) const
 {
     if (!ReadRegister16(kMagAddress, static_cast<uint8_t>(Magnetometer::OutputRegister::Out_X_L_M), rawValues.x))

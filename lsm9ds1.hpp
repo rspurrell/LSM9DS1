@@ -149,6 +149,15 @@ public:
     bool ReadGyroscopeDps(Math::Vector3<float>& dps) const;
 
     /**
+     * @brief Reads the current angular velocity in radians per seond.
+     *
+     * @param[out] dps Gyroscope values in radians per second.
+     *
+     * @return True if successful.
+     */
+    bool ReadGyroscopeRps(Math::Vector3<float>& rps) const;
+
+    /**
      * @brief Reads the current magnetometer sensor data.
      *
      * @param[out] rawValues Raw magnetometer values.
