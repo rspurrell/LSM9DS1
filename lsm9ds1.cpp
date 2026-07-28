@@ -142,23 +142,12 @@ bool LSM9DS1::InitializeMagnetometer(
     Magnetometer::CtrlReg5M::Configuration configR5M
 )
 {
-    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg1M), configR1M.value))
-    {
-        return false;
-    }
-    pCtrlReg1MConfig_ = std::make_unique<Magnetometer::CtrlReg1M::Configuration>(configR1M);
 
     if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg2M), configR2M.value))
     {
         return false;
     }
     pCtrlReg2MConfig_ = std::make_unique<Magnetometer::CtrlReg2M::Configuration>(configR2M);
-
-    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg3M), configR3M.value))
-    {
-        return false;
-    }
-    pCtrlReg3MConfig_ = std::make_unique<Magnetometer::CtrlReg3M::Configuration>(configR3M);
 
     if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg4M), configR4M.value))
     {
@@ -171,11 +160,29 @@ bool LSM9DS1::InitializeMagnetometer(
         return false;
     }
     pCtrlReg5MConfig_ = std::make_unique<Magnetometer::CtrlReg5M::Configuration>(configR5M);
+
+    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg1M), configR1M.value))
+    {
+        return false;
+    }
+    pCtrlReg1MConfig_ = std::make_unique<Magnetometer::CtrlReg1M::Configuration>(configR1M);
+
+    if (!WriteRegister(kMagAddress, static_cast<uint8_t>(Magnetometer::ControlRegister::CtrlReg3M), configR3M.value))
+    {
+        return false;
+    }
+    pCtrlReg3MConfig_ = std::make_unique<Magnetometer::CtrlReg3M::Configuration>(configR3M);
+
     return true;
 }
 
 bool LSM9DS1::ReadAcceleration(Math::Vector3<int16_t>& rawValues) const
 {
+    if (!pCtrlReg6XLConfig_)
+    {
+        return false;
+    }
+
     if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Accelerometer::OutputRegister::Out_X_L_XL), rawValues.x))
     {
         return false;
@@ -196,11 +203,6 @@ bool LSM9DS1::ReadAcceleration(Math::Vector3<int16_t>& rawValues) const
 
 bool LSM9DS1::ReadAccelerationMetersPerSecondSquared(Math::Vector3<float>& accMpsps) const
 {
-    if (!pCtrlReg6XLConfig_)
-    {
-        return false;
-    }
-
     Math::Vector3<int16_t> rawValues;
     if (!ReadAcceleration(rawValues))
     {
@@ -214,11 +216,6 @@ bool LSM9DS1::ReadAccelerationMetersPerSecondSquared(Math::Vector3<float>& accMp
 
 bool LSM9DS1::ReadAccelerationGs(Math::Vector3<float>& accGs) const
 {
-    if (!pCtrlReg6XLConfig_)
-    {
-        return false;
-    }
-
     Math::Vector3<int16_t> rawValues;
     if (!ReadAcceleration(rawValues))
     {
@@ -232,6 +229,11 @@ bool LSM9DS1::ReadAccelerationGs(Math::Vector3<float>& accGs) const
 
 bool LSM9DS1::ReadGyroscope(Math::Vector3<int16_t>& rawValues) const
 {
+    if (!pCtrlReg1GConfig_)
+    {
+        return false;
+    }
+
     if (!ReadRegister16(kAccelGyroAddress, static_cast<uint8_t>(Gyroscope::OutputRegister::Out_X_L_G), rawValues.x))
     {
         return false;
@@ -252,11 +254,6 @@ bool LSM9DS1::ReadGyroscope(Math::Vector3<int16_t>& rawValues) const
 
 bool LSM9DS1::ReadGyroscopeDps(Math::Vector3<float>& dps) const
 {
-    if (!pCtrlReg1GConfig_)
-    {
-        return false;
-    }
-
     Math::Vector3<int16_t> rawValues;
     if (!ReadGyroscope(rawValues))
     {
@@ -283,6 +280,11 @@ bool LSM9DS1::ReadGyroscopeRps(Math::Vector3<float>& rps) const
 
 bool LSM9DS1::ReadMagnetometer(Math::Vector3<int16_t>& rawValues) const
 {
+    if (!pCtrlReg3MConfig_ || !pCtrlReg2MConfig_)
+    {
+        return false;
+    }
+
     if (!ReadRegister16(kMagAddress, static_cast<uint8_t>(Magnetometer::OutputRegister::Out_X_L_M), rawValues.x))
     {
         return false;
@@ -297,16 +299,12 @@ bool LSM9DS1::ReadMagnetometer(Math::Vector3<int16_t>& rawValues) const
     {
         return false;
     }
+
     return true;
 }
 
 bool LSM9DS1::ReadMagnetometerMilliGauss(Math::Vector3<float>& magMilliGauss) const
 {
-    if (!pCtrlReg3MConfig_ || !pCtrlReg2MConfig_)
-    {
-        return false;
-    }
-
     Math::Vector3<int16_t> rawValues;
     if (!ReadMagnetometer(rawValues))
     {
