@@ -182,7 +182,7 @@ The filter maintains orientation internally as a quaternion and provides the res
 Create the filter with proportional and integral feedback gains:
 
 ```cpp
-Math::MahonyAHRS mahony(1.0f, 0.3f);
+Math::MahonyAHRS mahony(1.0f, 0.0f);
 ```
 
 For each sensor update, calculate the elapsed time since the previous update and pass the sensor measurements to `Update()`:
@@ -212,7 +212,7 @@ while (true)
 
 `GetEulerAngles()` returns the estimated orientation as roll, pitch, and yaw angles. Yaw is referenced to magnetic north.
 
-The proportional gain controls how quickly the filter corrects orientation errors, while the integral gain can be used to compensate for accumulated gyroscope bias. The default gains are `10.0f` and `0.0f`, respectively.
+The proportional gain controls how quickly the filter corrects orientation errors, while the integral gain can be used to compensate for accumulated gyroscope bias. The default gains are `1.0f` and `0.0f`, respectively.
 
 ## Device Verification
 

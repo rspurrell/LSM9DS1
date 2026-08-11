@@ -30,10 +30,10 @@ namespace Math
          * Initializes the filter state with an identity quaternion (q = [1, 0, 0, 0]^T),
          * representing a perfectly level, north-facing initial target orientation.
          *
-         * @param[in] proportionalGain Tuning parameter for error correction speed. Defaults to 10.0f.
+         * @param[in] proportionalGain Tuning parameter for error correction speed. Defaults to 1.0f.
          * @param[in] integralGain Tuning parameter for gyro bias correction accumulation. Defaults to 0.0f.
          */
-        MahonyAHRS(float proportionalGain = 10.0f, float integralGain = 0.0f)
+        MahonyAHRS(float proportionalGain = 1.0f, float integralGain = 0.0f)
             : kp(proportionalGain), ki(integralGain), q0(1.0f), q1(0.0f), q2(0.0f), q3(0.0f),
             eIntX(0.0f), eIntY(0.0f), eIntZ(0.0f)
         {}
@@ -82,9 +82,9 @@ namespace Math
          *
          * Governs the closing rate and convergence speed of sensor errors. Higher values force
          * accelerometer and magnetometer inputs to correct gyroscope drift faster, but introduce
-         * high-frequency vibration/noise to the output angles. Default value is 10.0f.
+         * high-frequency vibration/noise to the output angles. Default value is 1.0f.
          */
-        float kp = 10.0f;
+        float kp = 1.0f;
 
         /**
          * @brief Integral gain coefficient K_i.
